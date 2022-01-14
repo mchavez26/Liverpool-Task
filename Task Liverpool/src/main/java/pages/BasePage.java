@@ -1,4 +1,4 @@
-package com.encora.automation.pages;
+package pages;
 
 import org.openqa.selenium.WebDriver;
 
@@ -6,7 +6,7 @@ public class BasePage {
 
     private WebDriver webDriver;
 
-    BasePage(WebDriver webDriver){
+    protected BasePage(WebDriver webDriver){
         this.webDriver = webDriver;
     }
 
