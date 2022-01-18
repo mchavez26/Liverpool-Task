@@ -12,7 +12,7 @@ public class BaseTest {
         return DriverHandler.getWebDriver();
     }
 
-    @BeforeTest //executed before the tests
+    @BeforeTest
     protected void openLiverpoolURL(){
         getDriver().get("https://www.liverpool.com.mx/tienda/home");
     }
@@ -26,5 +26,4 @@ public class BaseTest {
     protected void closeDriver(){
         DriverHandler.closeDriver();
     }
-
 }
