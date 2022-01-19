@@ -24,11 +24,10 @@ public class BasePage {
     }
 
     protected WebElement findElement(By locator){
-        wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-        return getWebDriver().findElement(locator);
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
-    protected List<WebElement> findElements(By locator){ ///FIX THIS
+    protected List<WebElement> findElements(By locator){
         wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
         return getWebDriver().findElements(locator);
     }
@@ -47,7 +46,7 @@ public class BasePage {
         return element.getText();
     }
 
-    protected String getElementAttributeOfAList(WebElement productImageElement, String attribute){
-        return productImageElement.getAttribute(attribute);
+    protected String getElementAttribute(WebElement element, String attribute){
+            return element.getAttribute(attribute);
     }
 }

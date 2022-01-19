@@ -1,11 +1,12 @@
-package objects;
+package dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Product {
     private String productName;
     private String productDescription;
-    private String productPrice;
+    private BigDecimal productPrice;
     private List<String> images;
 
     public String getProductName() {
@@ -24,11 +25,11 @@ public class Product {
         this.productDescription = productDescription;
     }
 
-    public String getProductPrice() {
+    public BigDecimal getProductPrice() {
         return productPrice;
     }
 
-    public void setProductPrice(String productPrice) {
+    public void setProductPrice(BigDecimal productPrice) {
         this.productPrice = productPrice;
     }
 
@@ -45,7 +46,7 @@ public class Product {
         return "Product{ \n" +
                 "Product Name = '" + productName + '\'' +
                 ",\nProduct Description = '" + productDescription + '\'' +
-                ",\nProduct Price = '" + productPrice + '\'' +
+                ",\nProduct Price = '$" + productPrice + '\'' +
                 ",\nImages = " + images +
                 '}';
     }

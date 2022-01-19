@@ -1,10 +1,11 @@
 package pages;
 
-import objects.Product;
+import dao.Product;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ProductPage extends BasePage{
         Product product = new Product();
         product.setProductName(getTextFromProductName());
         product.setProductDescription(getTextFromProductDescription());
-        product.setProductPrice(getTextFromProductPrice());
+        product.setProductPrice(getProductPrice());
         product.setImages(getURLFromProductImages());
         return product;
     }
@@ -36,20 +37,18 @@ public class ProductPage extends BasePage{
         return getElementText(productDescription);
     }
 
-    public String getTextFromProductPrice(){
-        return getElementText(productPrice).replace("\n",".");
-    }
-
-    public int countProductImages(){
-        return getProductInfo().getImages().size();
+    public BigDecimal getProductPrice(){
+        String test = getElementText(productPrice).substring(1).replace("\n",".").replace(",", "");
+        BigDecimal bigDecimalPrice = new BigDecimal(test);
+        return bigDecimalPrice;
     }
 
     public List<String> getURLFromProductImages(){
         List<WebElement> productImagesList = findElements(productImages);
         List<String> urlList = new ArrayList<>();
-        for (WebElement Urls: productImagesList
-        ) {
-            urlList.add(getElementAttributeOfAList(Urls, "src"));
+
+        for (WebElement Urls: productImagesList) {
+            urlList.add(getElementAttribute(Urls, "src"));
         }
         return urlList;
     }

@@ -5,8 +5,8 @@ import org.openqa.selenium.WebDriver;
 
 public class HomePage extends BasePage {
 
-    private By searchBar =By.id("mainSearchbar");
-    private By searchBarButton = By.cssSelector(".input-group-text .icon-zoom");
+    private By searchBar = By.id("mainSearchbar");
+    private By searchBarButton = By.cssSelector(".input-group-text");
 
     public HomePage(WebDriver webDriver) {
         super(webDriver);
@@ -16,8 +16,8 @@ public class HomePage extends BasePage {
         click(searchBar);
     }
 
-    public void typeSearchBar(){
-        type(searchBar, "1103656130");
+    public void typeSearchBar(String textToSearch){
+        type(searchBar, textToSearch);
     }
 
     public void clickSearchBarButton(){
