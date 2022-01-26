@@ -1,32 +1,29 @@
 package com.encora.automation.test;
 
-import com.encora.automation.framework.DriverHandler;
-import com.encora.automation.pages.HomePage;
+import framework.DriverHandler;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 
 public class BaseTest {
 
-    protected HomePage homePage;
-
-    BaseTest(){
-        homePage = new HomePage(getDriver2());
-    }
-
-    private WebDriver getDriver2(){
+    protected WebDriver getDriver(){
         return DriverHandler.getWebDriver();
     }
 
-    @BeforeSuite
+    @BeforeTest
     protected void openLiverpoolURL(){
-        getDriver2().get("https://www.liverpool.com.mx/tienda/home");
+        getDriver().get("https://www.liverpool.com.mx/tienda/home");
+    }
+
+    @AfterTest
+    protected void teardownSuite(){
+        DriverHandler.teardown();
     }
 
     @AfterSuite
-    protected void teardownSuite(){
-        DriverHandler.teardown();
+    protected void closeDriver(){
         DriverHandler.closeDriver();
     }
-
 }
