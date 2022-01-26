@@ -27,7 +27,7 @@ public class HomeTest extends BaseTest{
 
     @Test
     //Validates that when the user searches for a specific product (1103656130), the expected elements are displayed in the product page (name, description, price and images).
-    private void tc1_SearchWithCode (){
+    private void tc1_SearchWithCode_InfoDisplayedCorrectly (){
         homePage.clickSearchBar();
         homePage.typeSearchBar("1103656130");
         homePage.clickSearchBarButton();
@@ -43,7 +43,7 @@ public class HomeTest extends BaseTest{
 
     @Test
     //Validates that when searching "macbook", the number of results displayed at the upper right corner of the screen matches with the real number of results.
-    private void tc2_SearchMacbook(){
+    private void tc2_SearchMacbook_ResultsDisplayedCorrectly(){
         homePage.clickSearchBar();
         homePage.typeSearchBar("macbook");
         homePage.clickSearchBarButton();
