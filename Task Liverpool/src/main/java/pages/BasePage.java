@@ -28,13 +28,16 @@ public class BasePage {
     }
 
     protected List<WebElement> findElements(By locator){
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
-        return getWebDriver().findElements(locator);
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
+    protected List<WebElement> findElementsAfterElementsUpdated(By locator, By existingElementLocator){
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(existingElementLocator));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
     protected void click(By locator){
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-        element.click();
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
     protected void type(By locator, String text){
@@ -48,5 +51,9 @@ public class BasePage {
 
     protected String getElementAttribute(WebElement element, String attribute){
             return element.getAttribute(attribute);
+    }
+
+    protected boolean isElementDisplayed(By locator){
+            return wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
     }
 }

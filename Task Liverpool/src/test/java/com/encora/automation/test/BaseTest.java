@@ -15,6 +15,7 @@ public class BaseTest {
     @BeforeTest
     protected void openLiverpoolURL(){
         getDriver().get("https://www.liverpool.com.mx/tienda/home");
+        getDriver().manage().window().maximize();
     }
 
     @AfterTest

@@ -3,6 +3,7 @@ package com.encora.automation.test;
 import dao.Product;
 import org.testng.Assert;
 import pages.HomePage;
+import pages.SearchResultsPage;
 import pages.ProductPage;
 import org.testng.annotations.Test;
 
@@ -13,12 +14,14 @@ public class HomeTest extends BaseTest{
 
     private HomePage homePage;
     private ProductPage productPage;
+    private SearchResultsPage searchResultsPage;
     private static Logger logger;
     private Product productInfo;
 
     private HomeTest(){
         homePage = new HomePage(getDriver());
         productPage = new ProductPage(getDriver());
+        searchResultsPage = new SearchResultsPage(getDriver());
         logger = Logger.getLogger(HomeTest.class.getName());
     }
 
@@ -38,4 +41,14 @@ public class HomeTest extends BaseTest{
         logger.info(productInfo.toString());
     }
 
+    @Test
+    //Validates that when searching "macbook", the number of results displayed at the upper right corner of the screen matches with the real number of results.
+    private void tc2_SearchMacbook(){
+        homePage.clickSearchBar();
+        homePage.typeSearchBar("macbook");
+        homePage.clickSearchBarButton();
+        int numberOfResultsFromLabel = searchResultsPage.getNumberOfResultsFromUpperRightLabel();
+        int numberOfResultsDisplayed = searchResultsPage.getTotalNumberOfResultsDisplayed();
+        Assert.assertEquals(numberOfResultsFromLabel, numberOfResultsDisplayed);
+    }
 }
