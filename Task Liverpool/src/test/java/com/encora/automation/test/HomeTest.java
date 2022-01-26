@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.logging.Logger;
 
 public class HomeTest extends BaseTest{
-
     private HomePage homePage;
     private ProductPage productPage;
     private SearchResultsPage searchResultsPage;
@@ -27,10 +26,8 @@ public class HomeTest extends BaseTest{
 
     @Test
     //Validates that when the user searches for a specific product (1103656130), the expected elements are displayed in the product page (name, description, price and images).
-    private void tc1_SearchWithCode (){
-        homePage.clickSearchBar();
-        homePage.typeSearchBar("1103656130");
-        homePage.clickSearchBarButton();
+    private void tc1_SearchWithCode_InfoDisplayedCorrectly (){
+        homePage.searchItem("1103656130");
         productInfo = productPage.getProductInfo();
         Assert.assertEquals(productInfo.getProductName() , "Apple MacBook Pro (13 Pulgadas, Chip M1, 8 GB RAM, 256 GB SSD) - Gris Espacial", "Product Name is Incorrect.");
         Assert.assertTrue(productInfo.getProductDescription().contains("El chip M1 de Apple redefine al Macbook Pro de 13 pulgadas."), "Description does Not contain expected text");
@@ -43,12 +40,20 @@ public class HomeTest extends BaseTest{
 
     @Test
     //Validates that when searching "macbook", the number of results displayed at the upper right corner of the screen matches with the real number of results.
-    private void tc2_SearchMacbook(){
-        homePage.clickSearchBar();
-        homePage.typeSearchBar("macbook");
-        homePage.clickSearchBarButton();
+    private void tc2_SearchMacbook_ResultsDisplayedCorrectly(){
+        homePage.searchItem("macbook");
         int numberOfResultsFromLabel = searchResultsPage.getNumberOfResultsFromUpperRightLabel();
         int numberOfResultsDisplayed = searchResultsPage.getTotalNumberOfResultsDisplayed();
-        Assert.assertEquals(numberOfResultsFromLabel, numberOfResultsDisplayed);
+        Assert.assertEquals(numberOfResultsFromLabel, numberOfResultsDisplayed, "Number of Results Displayed is Not Correct");
+    }
+
+    @Test
+    //Validates that the List View is working correctly and also the sort by price functionality works.
+    private void tc3_SearchMacbook_ListViewAndSortByPrice(){
+        homePage.searchItem("macbook");
+        searchResultsPage.clickListViewButton();
+        searchResultsPage.clickSortByPrice();
+        searchResultsPage.checkPriceIsSorted();
+        Assert.assertTrue(searchResultsPage.checkPriceIsSorted(), "Prices were Not sorted correctly");
     }
 }
