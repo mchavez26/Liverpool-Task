@@ -13,7 +13,7 @@ public class BaseTest {
     }
 
     @BeforeTest
-    protected void openBrowserAndMaximize(){
+    protected void setBrowser(){
         getDriver().manage().window().maximize();
     }
 

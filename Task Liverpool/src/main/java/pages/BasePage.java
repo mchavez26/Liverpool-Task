@@ -30,7 +30,9 @@ public class BasePage {
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
-    protected List<WebElement> findElementsAfterElementsUpdated(By locator, By existingElementLocator){
+    //The following method also finds elements but only after one of the current existing elements disappear (which happens when current page changes)
+    //It helps so that the loops wait until the page changes to find elements and start next iteration
+    protected List<WebElement> findElementsAfterACurrentElementDisappear(By locator, By existingElementLocator){
         wait.until(ExpectedConditions.invisibilityOfElementLocated(existingElementLocator));
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }

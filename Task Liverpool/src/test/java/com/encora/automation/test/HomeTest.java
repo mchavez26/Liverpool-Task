@@ -24,9 +24,8 @@ public class HomeTest extends BaseTest{
         logger = Logger.getLogger(HomeTest.class.getName());
     }
 
-    @Test
-    //Validates that when the user searches for a specific product (1103656130), the expected elements are displayed in the product page (name, description, price and images).
-    private void tc1_SearchWithCode_InfoDisplayedCorrectly (){
+    @Test (description = "Validates that when the user searches for a specific product (1103656130), the expected elements are displayed in the product page (name, description, price and images).")
+    public void tc1_SearchWithCode_InfoDisplayedCorrectly (){
         homePage.searchItem("1103656130");
         productInfo = productPage.getProductInfo();
         Assert.assertEquals(productInfo.getProductName() , "Apple MacBook Pro (13 Pulgadas, Chip M1, 8 GB RAM, 256 GB SSD) - Gris Espacial", "Product Name is Incorrect.");
@@ -38,18 +37,16 @@ public class HomeTest extends BaseTest{
         logger.info(productInfo.toString());
     }
 
-    @Test
-    //Validates that when searching "macbook", the number of results displayed at the upper right corner of the screen matches with the real number of results.
-    private void tc2_SearchMacbook_ResultsDisplayedCorrectly(){
+    @Test (description = "Validates that when searching \"macbook\", the number of results displayed at the upper right corner of the screen matches with the real number of results.")
+    public void tc2_SearchMacbook_ResultsDisplayedCorrectly(){
         homePage.searchItem("macbook");
         int numberOfResultsFromLabel = searchResultsPage.getNumberOfResultsFromUpperRightLabel();
         int numberOfResultsDisplayed = searchResultsPage.getTotalNumberOfResultsDisplayed();
         Assert.assertEquals(numberOfResultsFromLabel, numberOfResultsDisplayed, "Number of Results Displayed is Not Correct");
     }
 
-    @Test
-    //Validates that the List View is working correctly and also the sort by price functionality works.
-    private void tc3_SearchMacbook_ListViewAndSortByPrice(){
+    @Test (description = "Validates that the List View is working correctly and also the sort by price functionality works.")
+    public void tc3_SearchMacbook_ListViewAndSortByPrice(){
         homePage.searchItem("macbook");
         searchResultsPage.clickListViewButton();
         searchResultsPage.clickSortByPrice();

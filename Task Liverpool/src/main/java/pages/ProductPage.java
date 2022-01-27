@@ -38,8 +38,7 @@ public class ProductPage extends BasePage{
 
     public BigDecimal getProductPrice(){
         String priceText = getElementText(productPrice).substring(1).replace("\n",".").replace(",", "");
-        BigDecimal bigDecimalPrice = new BigDecimal(priceText);
-        return bigDecimalPrice;
+        return new BigDecimal(priceText);
     }
 
     public List<String> getURLFromProductImages(){
