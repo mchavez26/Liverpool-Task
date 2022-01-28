@@ -1,7 +1,6 @@
 package pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -13,11 +12,18 @@ public class SearchResultsPage extends BasePage{
     private By searchResultsDisplayed = By.cssSelector("li.m-product__card");
     private By listViewButton = By.cssSelector(".icon-vistalista");
     private By sortByDropDownList = By.cssSelector(".col-lg-9 #sortby");
-    private By sortByPrice = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sortPrice|1\"]");
+    private By sortByRelevance = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/Relevancia|0\"]");
+    private By sortByLowPrice = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sortPrice|0\"]");
+    private By sortByHighPrice = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sortPrice|1\"]");
+    private By sortByRating = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/rating|1\"]");
+    private By sortByViewed = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/viewed|1\"]");
+    private By sortBySold = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sold|1\"]");
     private By productPrice = By.cssSelector(".m-product__card .a-card-discount");
     private By rightArrow = By.cssSelector(".page-link .icon-arrow_right");
 
-    JavascriptExecutor js = (JavascriptExecutor) getWebDriver();
+    public enum SortType {
+        RELEVANCE, LOWPRICE, HIGHPRICE, RATING, VIEWED, SOLD
+    }
 
     public SearchResultsPage(WebDriver webDriver) {
         super(webDriver);
@@ -34,7 +40,7 @@ public class SearchResultsPage extends BasePage{
         while (isElementDisplayed(rightArrow)){
             String productId = getElementAttribute(findElement(searchResultsDisplayed), "data-prodid");
             By firstResult = By.cssSelector("li.m-product__card[data-prodid=\"" + productId + "\"]");
-            js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+            scrollToElement(rightArrow);
             click(rightArrow);
             totalResults += findElementsAfterACurrentElementDisappear(searchResultsDisplayed, firstResult).size();
         }
@@ -45,9 +51,34 @@ public class SearchResultsPage extends BasePage{
         click(listViewButton);
     }
 
-    public void clickSortByPrice(){
+    public void sortProductsBy (SortType sortType){
+
         click(sortByDropDownList);
-        click(sortByPrice);
+        switch (sortType) {
+            case RELEVANCE:
+                click(sortByRelevance);
+                break;
+
+            case LOWPRICE:
+                click(sortByLowPrice);
+                break;
+
+            case HIGHPRICE:
+                click(sortByHighPrice);
+                break;
+
+            case RATING:
+                click(sortByRating);
+                break;
+
+            case VIEWED:
+                click(sortByViewed);
+                break;
+
+            case SOLD:
+                click(sortBySold);
+                break;
+        }
     }
 
     public boolean checkPriceIsSorted(){
@@ -62,7 +93,7 @@ public class SearchResultsPage extends BasePage{
         while (isElementDisplayed(rightArrow)){
             String productId = getElementAttribute(findElement(searchResultsDisplayed), "data-prodid");
             By firstResult = By.cssSelector("li.m-product__card[data-prodid=\"" + productId + "\"]");
-            js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+            scrollToElement(rightArrow);
             click(rightArrow);
             pricesList = findElementsAfterACurrentElementDisappear(productPrice, firstResult);
             for (WebElement prices: pricesList) {

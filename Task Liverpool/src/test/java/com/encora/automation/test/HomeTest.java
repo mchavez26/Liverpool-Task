@@ -49,7 +49,7 @@ public class HomeTest extends BaseTest{
     public void tc3_SearchMacbook_ListViewAndSortByPrice(){
         homePage.searchItem("macbook");
         searchResultsPage.clickListViewButton();
-        searchResultsPage.clickSortByPrice();
+        searchResultsPage.sortProductsBy(SearchResultsPage.SortType.HIGHPRICE);
         searchResultsPage.checkPriceIsSorted();
         Assert.assertTrue(searchResultsPage.checkPriceIsSorted(), "Prices were Not sorted correctly");
     }

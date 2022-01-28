@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,10 +13,12 @@ import java.util.List;
 public class BasePage {
     private WebDriver webDriver;
     private WebDriverWait wait;
+    private JavascriptExecutor js;
 
     protected BasePage(WebDriver webDriver){
         this.webDriver = webDriver;
         wait = new WebDriverWait(webDriver, Duration.ofSeconds(10,1));
+        js = (JavascriptExecutor) getWebDriver();
     }
 
     protected WebDriver getWebDriver(){
@@ -56,5 +59,9 @@ public class BasePage {
 
     protected boolean isElementDisplayed(By locator){
             return wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
+    }
+
+    protected void scrollToElement(By locator){
+        js.executeScript("arguments[0].scrollIntoView();", findElement(locator));
     }
 }
