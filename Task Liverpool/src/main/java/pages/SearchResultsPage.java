@@ -20,6 +20,13 @@ public class SearchResultsPage extends BasePage{
     private By sortBySold = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sold|1\"]");
     private By productPrice = By.cssSelector(".m-product__card .a-card-discount");
     private By rightArrow = By.cssSelector(".page-link .icon-arrow_right");
+    private By filterLowerThan$500Button = By.id("variants.prices.sortPrice-100-500");
+    //private By filterLowerThan$500Button2 = By.xpath("//input[@id='variants.prices.sortPrice-100-500']"); //Please ignore these locators, I am leaving them here for future reference
+    //private By filterLowerThan$500Button3 = By.cssSelector("#variants\\.prices\\.sortPrice-100-500"); //Please ignore these locators, I am leaving them here for future reference
+    private By noResultsText = By.cssSelector(".a-headline__noResults");
+    private By firstResult;
+    List<WebElement> pricesList;
+    List<Integer> pricesIntList;
 
     public enum SortType {
         RELEVANCE, LOWPRICE, HIGHPRICE, RATING, VIEWED, SOLD
@@ -33,15 +40,24 @@ public class SearchResultsPage extends BasePage{
         return Integer.parseInt(getElementText(numberOfResultsFromUpperRightLabel));
     }
 
+    //Logic for clicking on the Results Page Right Arrow
+    public boolean clickNextPage(){
+        if (isElementDisplayed(rightArrow)){
+            String productId = getElementAttribute(findElement(searchResultsDisplayed), "data-prodid");
+            firstResult = By.cssSelector("li.m-product__card[data-prodid=\"" + productId + "\"]");
+            scrollToElement(rightArrow);
+            click(rightArrow);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     public int getTotalNumberOfResultsDisplayed() {
         int totalResults = findElements(searchResultsDisplayed).size();
 
-        //Logic for clicking on the Results Page Right Arrow with a While
-        while (isElementDisplayed(rightArrow)){
-            String productId = getElementAttribute(findElement(searchResultsDisplayed), "data-prodid");
-            By firstResult = By.cssSelector("li.m-product__card[data-prodid=\"" + productId + "\"]");
-            scrollToElement(rightArrow);
-            click(rightArrow);
+        while (clickNextPage()){
             totalResults += findElementsAfterACurrentElementDisappear(searchResultsDisplayed, firstResult).size();
         }
         return totalResults;
@@ -51,7 +67,7 @@ public class SearchResultsPage extends BasePage{
         click(listViewButton);
     }
 
-    public void sortProductsBy (SortType sortType){
+    public void clickSortProductsBy (SortType sortType) throws InterruptedException {
 
         click(sortByDropDownList);
         switch (sortType) {
@@ -79,27 +95,30 @@ public class SearchResultsPage extends BasePage{
                 click(sortBySold);
                 break;
         }
+        Thread.sleep(1000);
     }
 
-    public boolean checkPriceIsSorted(){
-        List<WebElement> pricesList = findElements(productPrice);
-        List<Integer> pricesIntList = new ArrayList<>();
+    public void getPricesInt(){
+        pricesList = findElements(productPrice);
+        pricesIntList = new ArrayList<>();
 
         for (WebElement prices: pricesList) {
             pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
         }
+    }
 
-        //Logic for clicking on the Results Page Right Arrow with a While
-        while (isElementDisplayed(rightArrow)){
-            String productId = getElementAttribute(findElement(searchResultsDisplayed), "data-prodid");
-            By firstResult = By.cssSelector("li.m-product__card[data-prodid=\"" + productId + "\"]");
-            scrollToElement(rightArrow);
-            click(rightArrow);
+    public void addValuesToPricesIntListFromMoreResultsPages(){
+        while (clickNextPage()){
             pricesList = findElementsAfterACurrentElementDisappear(productPrice, firstResult);
             for (WebElement prices: pricesList) {
                 pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
             }
         }
+    }
+
+    public boolean checkPriceIsSorted(){
+        getPricesInt();
+        addValuesToPricesIntListFromMoreResultsPages();
 
         for (int i = 0; i < pricesIntList.size() - 1; i++){
             boolean compare = (pricesIntList.get(i) >= pricesIntList.get(i + 1));
@@ -108,5 +127,26 @@ public class SearchResultsPage extends BasePage{
             }
         }
         return true;
+    }
+
+    public void clickFilterLowerThan$500() throws InterruptedException {
+        findElement(filterLowerThan$500Button).click();
+        Thread.sleep(1000);
+    }
+
+    public boolean pricesAreLowerThan$500(){
+        getPricesInt();
+
+        for (int priceInt: pricesIntList
+             ) {
+            if (priceInt > 50000){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean noResultsFound(){
+        return  isElementDisplayedWithTryCatch(noResultsText);
     }
 }

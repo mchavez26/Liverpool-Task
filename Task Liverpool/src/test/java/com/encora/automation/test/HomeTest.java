@@ -46,11 +46,25 @@ public class HomeTest extends BaseTest{
     }
 
     @Test (description = "Validates that the List View is working correctly and also the sort by price functionality works.")
-    public void tc3_SearchMacbook_ListViewAndSortByPrice(){
+    public void tc3_SearchMacbook_ListViewAndSortByPrice() throws InterruptedException {
         homePage.searchItem("macbook");
         searchResultsPage.clickListViewButton();
-        searchResultsPage.sortProductsBy(SearchResultsPage.SortType.HIGHPRICE);
+        searchResultsPage.clickSortProductsBy(SearchResultsPage.SortType.HIGHPRICE);
         searchResultsPage.checkPriceIsSorted();
         Assert.assertTrue(searchResultsPage.checkPriceIsSorted(), "Prices were Not sorted correctly");
     }
+
+    @Test (description = "Validates that the filter for the search results with a price lower than $500 is working correctly")
+    public void tc4_SearchMacbook_FilterLowerThan$500() throws InterruptedException {
+        homePage.searchItem("macbook");
+        searchResultsPage.clickFilterLowerThan$500();
+        Assert.assertTrue(searchResultsPage.pricesAreLowerThan$500(), "There are prices displayed that are No Lower than $500");
+    }
+
+    @Test (description = "Validates that the filter for the search results with a price lower than $500 is working correctly")
+    public void tc5_SearchReturnsNoResults() {
+        homePage.searchItem("aaaaabbbb");
+        Assert.assertTrue(searchResultsPage.noResultsFound(), "The No Results found screen is Not being displayed correctly");
+    }
+
 }

@@ -1,14 +1,12 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+
 
 public class BasePage {
     private WebDriver webDriver;
@@ -17,7 +15,7 @@ public class BasePage {
 
     protected BasePage(WebDriver webDriver){
         this.webDriver = webDriver;
-        wait = new WebDriverWait(webDriver, Duration.ofSeconds(10,1));
+        wait = new WebDriverWait(webDriver, Duration.ofSeconds(5,1));
         js = (JavascriptExecutor) getWebDriver();
     }
 
@@ -40,6 +38,12 @@ public class BasePage {
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
+    //The following method also finds elements but only after one expected elements appears (which happens when current page changes) //Not useful in current tests. Please Ignore.
+    protected List<WebElement> findElementsAfterAnExpectedElementAppears(By locator, By expectedElementLocator){
+        wait.until(ExpectedConditions.presenceOfElementLocated(expectedElementLocator));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
     protected void click(By locator){
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
@@ -59,6 +63,16 @@ public class BasePage {
 
     protected boolean isElementDisplayed(By locator){
             return wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
+    }
+
+    //This method exists because when I call the isElementDisplayed method from noResultsFound, it returns a NoSuchElementException when element is not displayed.
+    protected boolean isElementDisplayedWithTryCatch(By locator){
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
+            return true;
+        } catch (NoSuchElementException | TimeoutException e) {
+            return false;
+        }
     }
 
     protected void scrollToElement(By locator){
