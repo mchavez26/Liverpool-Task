@@ -23,10 +23,11 @@ public class SearchResultsPage extends BasePage{
     private By filterLowerThan$500Button = By.id("variants.prices.sortPrice-100-500");
     //private By filterLowerThan$500Button2 = By.xpath("//input[@id='variants.prices.sortPrice-100-500']"); //Please ignore these locators, I am leaving them here for future reference
     //private By filterLowerThan$500Button3 = By.cssSelector("#variants\\.prices\\.sortPrice-100-500"); //Please ignore these locators, I am leaving them here for future reference
-    private By noResultsText = By.cssSelector(".a-headline__noResults");
+    public By noResultsText = By.cssSelector(".a-headline__noResults");
     private By firstResult;
-    List<WebElement> pricesList;
-    List<Integer> pricesIntList;
+    public List<WebElement> pricesList;
+    public List<Integer> pricesIntList;
+    private String sortByText;
 
     public enum SortType {
         RELEVANCE, LOWPRICE, HIGHPRICE, RATING, VIEWED, SOLD
@@ -73,39 +74,53 @@ public class SearchResultsPage extends BasePage{
         switch (sortType) {
             case RELEVANCE:
                 click(sortByRelevance);
+                sortByText = "Relevancia";
                 break;
 
             case LOWPRICE:
                 click(sortByLowPrice);
+                sortByText = "sortPrice|0";
                 break;
 
             case HIGHPRICE:
                 click(sortByHighPrice);
+                sortByText = "sortPrice|1";
                 break;
 
             case RATING:
                 click(sortByRating);
+                sortByText = "rating";
                 break;
 
             case VIEWED:
                 click(sortByViewed);
+                sortByText = "viewed";
                 break;
 
             case SOLD:
                 click(sortBySold);
+                sortByText = "sold";
                 break;
         }
-        Thread.sleep(1000);
     }
 
-    public void getPricesInt(){
-        pricesList = findElements(productPrice);
+    public void definePricesIntListAfterSorting(){
+        pricesList = findElementsAfterAttributeChange(productPrice, sortByDropDownList, "href", sortByText);
         pricesIntList = new ArrayList<>();
 
         for (WebElement prices: pricesList) {
             pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
         }
     }
+
+    public void definePricesIntListAfterFiltering(String textFromLabel){
+        pricesList = findElementsAfterTextChanges(productPrice, numberOfResultsFromUpperRightLabel, textFromLabel);
+        pricesIntList = new ArrayList<>();
+
+        for (WebElement prices: pricesList) {
+            pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
+        }
+    } //I know this includes repeated code from the method above, I'll update it after making sure it works.
 
     public void addValuesToPricesIntListFromMoreResultsPages(){
         while (clickNextPage()){
@@ -116,37 +131,7 @@ public class SearchResultsPage extends BasePage{
         }
     }
 
-    public boolean checkPriceIsSorted(){
-        getPricesInt();
-        addValuesToPricesIntListFromMoreResultsPages();
-
-        for (int i = 0; i < pricesIntList.size() - 1; i++){
-            boolean compare = (pricesIntList.get(i) >= pricesIntList.get(i + 1));
-            if (!compare){
-                return false;
-            }
-        }
-        return true;
-    }
-
     public void clickFilterLowerThan$500() throws InterruptedException {
         findElement(filterLowerThan$500Button).click();
-        Thread.sleep(1000);
-    }
-
-    public boolean pricesAreLowerThan$500(){
-        getPricesInt();
-
-        for (int priceInt: pricesIntList
-             ) {
-            if (priceInt > 50000){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean noResultsFound(){
-        return  isElementDisplayedWithTryCatch(noResultsText);
     }
 }

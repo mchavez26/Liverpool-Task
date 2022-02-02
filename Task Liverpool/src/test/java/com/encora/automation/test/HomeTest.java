@@ -16,6 +16,8 @@ public class HomeTest extends BaseTest{
     private SearchResultsPage searchResultsPage;
     private static Logger logger;
     private Product productInfo;
+    private boolean compareIsSorted = true;
+    private boolean comparePricesLowerThan$500 = true;
 
     private HomeTest(){
         homePage = new HomePage(getDriver());
@@ -50,21 +52,37 @@ public class HomeTest extends BaseTest{
         homePage.searchItem("macbook");
         searchResultsPage.clickListViewButton();
         searchResultsPage.clickSortProductsBy(SearchResultsPage.SortType.HIGHPRICE);
-        searchResultsPage.checkPriceIsSorted();
-        Assert.assertTrue(searchResultsPage.checkPriceIsSorted(), "Prices were Not sorted correctly");
+        searchResultsPage.definePricesIntListAfterSorting();
+        searchResultsPage.addValuesToPricesIntListFromMoreResultsPages();
+        for (int i = 0; i < searchResultsPage.pricesIntList.size() - 1; i++){
+            compareIsSorted = (searchResultsPage.pricesIntList.get(i) >= searchResultsPage.pricesIntList.get(i + 1));
+            if (!compareIsSorted){
+                break;
+            }
+        }
+        Assert.assertTrue(compareIsSorted, "Prices were Not sorted correctly");
     }
 
     @Test (description = "Validates that the filter for the search results with a price lower than $500 is working correctly")
     public void tc4_SearchMacbook_FilterLowerThan$500() throws InterruptedException {
         homePage.searchItem("macbook");
+        String textFromLabel =  String.valueOf(searchResultsPage.getNumberOfResultsFromUpperRightLabel());
         searchResultsPage.clickFilterLowerThan$500();
-        Assert.assertTrue(searchResultsPage.pricesAreLowerThan$500(), "There are prices displayed that are No Lower than $500");
+        searchResultsPage.definePricesIntListAfterFiltering(textFromLabel);
+        for (int priceInt: searchResultsPage.pricesIntList
+        ) {
+            if (priceInt > 50000){
+                comparePricesLowerThan$500 = false;
+                break;
+            }
+        }
+        Assert.assertTrue(comparePricesLowerThan$500, "There are prices displayed that are No Lower than $500");
     }
 
     @Test (description = "Validates that the filter for the search results with a price lower than $500 is working correctly")
     public void tc5_SearchReturnsNoResults() {
         homePage.searchItem("aaaaabbbb");
-        Assert.assertTrue(searchResultsPage.noResultsFound(), "The No Results found screen is Not being displayed correctly");
+        Assert.assertTrue(homePage.isElementDisplayedWithTryCatch(searchResultsPage.noResultsText), "The No Results found screen is Not being displayed correctly");
     }
 
 }

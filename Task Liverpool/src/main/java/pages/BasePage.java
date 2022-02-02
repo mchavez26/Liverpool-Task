@@ -31,6 +31,16 @@ public class BasePage {
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
+    protected List<WebElement> findElementsAfterAttributeChange(By locator, By locatorToFindAttribute, String attribute, String value){
+        wait.until(ExpectedConditions.attributeContains(locatorToFindAttribute, attribute, value));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
+    protected List<WebElement> findElementsAfterTextChanges(By locatorToGetElements, By locatorToGetTextToCompare, String textFromLabel){
+        wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElementLocated(locatorToGetTextToCompare ,textFromLabel)));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locatorToGetElements));
+    }
+
     //The following method also finds elements but only after one of the current existing elements disappear (which happens when current page changes)
     //It helps so that the loops wait until the page changes to find elements and start next iteration
     protected List<WebElement> findElementsAfterACurrentElementDisappear(By locator, By existingElementLocator){
@@ -66,7 +76,7 @@ public class BasePage {
     }
 
     //This method exists because when I call the isElementDisplayed method from noResultsFound, it returns a NoSuchElementException when element is not displayed.
-    protected boolean isElementDisplayedWithTryCatch(By locator){
+    public boolean isElementDisplayedWithTryCatch(By locator){
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
             return true;
