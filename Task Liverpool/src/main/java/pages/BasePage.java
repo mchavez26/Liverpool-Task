@@ -1,22 +1,22 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
 
-public class BasePage {
 
+public class BasePage {
     private WebDriver webDriver;
     private WebDriverWait wait;
+    private JavascriptExecutor js;
 
     protected BasePage(WebDriver webDriver){
         this.webDriver = webDriver;
-        wait = new WebDriverWait(webDriver, Duration.ofSeconds(10,1));
+        wait = new WebDriverWait(webDriver, Duration.ofSeconds(5,1));
+        js = (JavascriptExecutor) getWebDriver();
     }
 
     protected WebDriver getWebDriver(){
@@ -28,13 +28,34 @@ public class BasePage {
     }
 
     protected List<WebElement> findElements(By locator){
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
-        return getWebDriver().findElements(locator);
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
+    protected List<WebElement> findElementsAfterAttributeChange(By locator, By locatorToFindAttribute, String attribute, String value){
+        wait.until(ExpectedConditions.attributeContains(locatorToFindAttribute, attribute, value));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
+    protected List<WebElement> findElementsAfterTextChanges(By locatorToGetElements, By locatorToGetTextToCompare, String textFromLabel){
+        wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElementLocated(locatorToGetTextToCompare ,textFromLabel)));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locatorToGetElements));
+    }
+
+    //The following method also finds elements but only after one of the current existing elements disappear (which happens when current page changes)
+    //It helps so that the loops wait until the page changes to find elements and start next iteration
+    protected List<WebElement> findElementsAfterACurrentElementDisappear(By locator, By existingElementLocator){
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(existingElementLocator));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+    }
+
+    //The following method also finds elements but only after one expected elements appears (which happens when current page changes) //Not useful in current tests. Please Ignore.
+    protected List<WebElement> findElementsAfterAnExpectedElementAppears(By locator, By expectedElementLocator){
+        wait.until(ExpectedConditions.presenceOfElementLocated(expectedElementLocator));
+        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
     protected void click(By locator){
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
-        element.click();
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
     protected void type(By locator, String text){
@@ -48,5 +69,23 @@ public class BasePage {
 
     protected String getElementAttribute(WebElement element, String attribute){
             return element.getAttribute(attribute);
+    }
+
+    protected boolean isElementDisplayed(By locator){
+            return wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
+    }
+
+    //This method exists because when I call the isElementDisplayed method from noResultsFound, it returns a NoSuchElementException when element is not displayed.
+    public boolean isElementDisplayedWithTryCatch(By locator){
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(locator)).isDisplayed();
+            return true;
+        } catch (NoSuchElementException | TimeoutException e) {
+            return false;
+        }
+    }
+
+    protected void scrollToElement(By locator){
+        js.executeScript("arguments[0].scrollIntoView();", findElement(locator));
     }
 }

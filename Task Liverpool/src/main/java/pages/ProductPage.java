@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductPage extends BasePage{
-
     private By productName = By.cssSelector(".o-product__description .a-product__information--title");
     private By productDescription = By.cssSelector(".a-product__paragraphProductDescriptionContentWeb");
     private By productPrice = By.cssSelector(".o-product__description .a-product__paragraphDiscountPrice");
@@ -38,9 +37,8 @@ public class ProductPage extends BasePage{
     }
 
     public BigDecimal getProductPrice(){
-        String test = getElementText(productPrice).substring(1).replace("\n",".").replace(",", "");
-        BigDecimal bigDecimalPrice = new BigDecimal(test);
-        return bigDecimalPrice;
+        String priceText = getElementText(productPrice).substring(1).replace("\n",".").replace(",", "");
+        return new BigDecimal(priceText);
     }
 
     public List<String> getURLFromProductImages(){
