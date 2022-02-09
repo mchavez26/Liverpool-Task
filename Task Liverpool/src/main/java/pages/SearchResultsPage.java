@@ -1,9 +1,11 @@
 package pages;
 
+import dao.Product;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,16 +20,15 @@ public class SearchResultsPage extends BasePage{
     private By sortByRating = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/rating|1\"]");
     private By sortByViewed = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/viewed|1\"]");
     private By sortBySold = By.cssSelector(".col-lg-9 .dropdown-menu [datahref=\"/tienda/sold|1\"]");
-    private By productPrice = By.cssSelector(".m-product__card .a-card-discount");
+    private By productPriceFromSearchPage = By.cssSelector(".m-product__card .a-card-discount");
     private By rightArrow = By.cssSelector(".page-link .icon-arrow_right");
     private By filterLowerThan$500Button = By.id("variants.prices.sortPrice-100-500");
-    //private By filterLowerThan$500Button2 = By.xpath("//input[@id='variants.prices.sortPrice-100-500']"); //Please ignore these locators, I am leaving them here for future reference
-    //private By filterLowerThan$500Button3 = By.cssSelector("#variants\\.prices\\.sortPrice-100-500"); //Please ignore these locators, I am leaving them here for future reference
     public By noResultsText = By.cssSelector(".a-headline__noResults");
     private By firstResult;
-    public List<WebElement> pricesList;
-    public List<Integer> pricesIntList;
+    private List<WebElement> pricesList;
     private String sortByText;
+    private Product productPreview = new Product();
+    private List<Product> productPreviewList = new ArrayList<Product>();
 
     public enum SortType {
         RELEVANCE, LOWPRICE, HIGHPRICE, RATING, VIEWED, SOLD
@@ -53,15 +54,6 @@ public class SearchResultsPage extends BasePage{
         else {
             return false;
         }
-    }
-
-    public int getTotalNumberOfResultsDisplayed() {
-        int totalResults = findElements(searchResultsDisplayed).size();
-
-        while (clickNextPage()){
-            totalResults += findElementsAfterACurrentElementDisappear(searchResultsDisplayed, firstResult).size();
-        }
-        return totalResults;
     }
 
     public void clickListViewButton(){
@@ -104,34 +96,44 @@ public class SearchResultsPage extends BasePage{
         }
     }
 
-    public void definePricesIntListAfterSorting(){
-        pricesList = findElementsAfterAttributeChange(productPrice, sortByDropDownList, "href", sortByText);
-        pricesIntList = new ArrayList<>();
+    public List<Product> getProductPreviewFromSearchPageList(String afterSortOrFilter, String textFromLabel){
+        if (afterSortOrFilter == "afterSort"){
+            pricesList = findElementsAfterAttributeChange(productPriceFromSearchPage, sortByDropDownList, "href", sortByText);
+        }
+        else if (afterSortOrFilter == "afterFilter"){
+            pricesList = findElementsAfterTextChanges(productPriceFromSearchPage, numberOfResultsFromUpperRightLabel, textFromLabel);
+        }
+        else {pricesList = findElements(productPriceFromSearchPage);
+        }
+
+        productPreviewList = new ArrayList<Product>();
 
         for (WebElement prices: pricesList) {
-            pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
+            productPreview = new Product();
+            String priceTextFromSearchPage = prices.getText().substring(1).replace(",", "");
+            String priceTextFromSearchpageWithPoint = priceTextFromSearchPage.substring(0,priceTextFromSearchPage.length() - 2) + "." + priceTextFromSearchPage.substring(priceTextFromSearchPage.length() - 2);
+            productPreview.setProductPrice(new BigDecimal(priceTextFromSearchpageWithPoint));
+            productPreviewList.add(productPreview);
         }
+        return productPreviewList;
     }
 
-    public void definePricesIntListAfterFiltering(String textFromLabel){
-        pricesList = findElementsAfterTextChanges(productPrice, numberOfResultsFromUpperRightLabel, textFromLabel);
-        pricesIntList = new ArrayList<>();
-
-        for (WebElement prices: pricesList) {
-            pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
-        }
-    } //I know this includes repeated code from the method above, I'll update it after making sure it works.
-
-    public void addValuesToPricesIntListFromMoreResultsPages(){
+    public List<Product> getMoreValuesForProductPreviewListFromMoreResultsPages(){
         while (clickNextPage()){
-            pricesList = findElementsAfterACurrentElementDisappear(productPrice, firstResult);
+            pricesList = findElementsAfterACurrentElementDisappear(productPriceFromSearchPage, firstResult);
+
             for (WebElement prices: pricesList) {
-                pricesIntList.add(Integer.parseInt(prices.getText().substring(1).replace(",", "")));
+                productPreview = new Product();
+                String priceTextFromSearchPage = prices.getText().substring(1).replace(",", "");
+                String priceTextFromSearchpageWithPoint = priceTextFromSearchPage.substring(0,priceTextFromSearchPage.length() - 2) + "." + priceTextFromSearchPage.substring(priceTextFromSearchPage.length() - 2);
+                productPreview.setProductPrice(new BigDecimal(priceTextFromSearchpageWithPoint));
+                productPreviewList.add(productPreview);
             }
         }
+        return productPreviewList;
     }
 
-    public void clickFilterLowerThan$500() throws InterruptedException {
+    public void clickFilterLowerThan$500(){
         findElement(filterLowerThan$500Button).click();
     }
 }

@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductPage extends BasePage{
-    private By productName = By.cssSelector(".o-product__description .a-product__information--title");
-    private By productDescription = By.cssSelector(".a-product__paragraphProductDescriptionContentWeb");
-    private By productPrice = By.cssSelector(".o-product__description .a-product__paragraphDiscountPrice");
-    private By productImages = By.cssSelector("#listBeforeEtalage .img-viewer img");
+    private By productNameFromProductPage = By.cssSelector(".o-product__description .a-product__information--title");
+    private By productDescriptionFromProductPage = By.cssSelector(".a-product__paragraphProductDescriptionContentWeb");
+    private By productPriceFromProductPage = By.cssSelector(".o-product__description .a-product__paragraphDiscountPrice");
+    private By productImagesFromProductPage = By.cssSelector("#listBeforeEtalage .img-viewer img");
 
     public ProductPage(WebDriver webDriver) {
         super(webDriver);
@@ -23,26 +23,26 @@ public class ProductPage extends BasePage{
         Product product = new Product();
         product.setProductName(getTextFromProductName());
         product.setProductDescription(getTextFromProductDescription());
-        product.setProductPrice(getProductPrice());
+        product.setProductPrice(getProductPriceBigDecimal());
         product.setImages(getURLFromProductImages());
         return product;
     }
 
     public String getTextFromProductName(){
-        return getElementText(productName);
+        return getElementText(productNameFromProductPage);
     }
 
     public String getTextFromProductDescription(){
-        return getElementText(productDescription);
+        return getElementText(productDescriptionFromProductPage);
     }
 
-    public BigDecimal getProductPrice(){
-        String priceText = getElementText(productPrice).substring(1).replace("\n",".").replace(",", "");
-        return new BigDecimal(priceText);
+    public BigDecimal getProductPriceBigDecimal(){
+        String priceTextFromProductPage = getElementText(productPriceFromProductPage).substring(1).replace("\n",".").replace(",", "");
+        return new BigDecimal(priceTextFromProductPage);
     }
 
     public List<String> getURLFromProductImages(){
-        List<WebElement> productImagesList = findElements(productImages);
+        List<WebElement> productImagesList = findElements(productImagesFromProductPage);
         List<String> urlList = new ArrayList<>();
 
         for (WebElement Urls: productImagesList) {
